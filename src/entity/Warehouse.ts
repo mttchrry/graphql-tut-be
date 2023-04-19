@@ -8,7 +8,7 @@ export class Warehouse {
   id: number
 
   @Column({ nullable: false })
-  name: string 
+  name: string
 
   // Warehouse can be associated with many WarehouseStocks
   @OneToMany(() => WarehouseStock, warehouseStock => warehouseStock.product)
@@ -19,4 +19,3 @@ export class Warehouse {
   inventoryTransactions: InventoryTransaction[];
 
 }
-
