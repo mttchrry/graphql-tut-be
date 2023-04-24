@@ -6,55 +6,55 @@ import { Subcategory } from './entity/Subcategory'
 import { Supplier } from './entity/Supplier'
 import { Uom } from './entity/Uom'
 import { Warehouse } from './entity/Warehouse'
-import postgraphile from 'postgraphile'
+import postgraphile from "postgraphile"
 import { makeExtendSchemaPlugin, gql } from "graphile-utils"
 import { registerTransaction } from './service/inventory'
 import cors from 'cors'
 
 const RegisterTransactionPlugin = makeExtendSchemaPlugin(_build => {
- return {
-   typeDefs: gql`
-     input RegisterTransactionInput {
-       type: InventoryTransactionTypeEnum!
-       productId: Int!
-       warehouseId: Int!
-       quantity: Int!
-     }
+  return {
+    typeDefs: gql`
+      input RegisterTransactionInput {
+        type: InventoryTransactionTypeEnum!
+        productId: Int!
+        warehouseId: Int!
+        quantity: Int!
+      }
 
-     type RegisterTransactionPayload {
-       transactionId: Int,
-       productId: Int,
-       warehouseId: Int,
-       updatedQuantity: Int,
-     }
+      type RegisterTransactionPayload {
+        transactionId: Int,
+        productId: Int,
+        warehouseId: Int,
+        updatedQuantity: Int,
+      }
 
-     extend type Mutation {
-       registerTransaction(input: RegisterTransactionInput!): RegisterTransactionPayload
-     }     
-   `,
-   resolvers: {
-     Mutation: {
-       registerTransaction: async (_query, args, _context, _resolveInfo) => {
-         try {
-           const { type, productId, warehouseId, quantity } = args.input
-           const inventoryTransaction = await registerTransaction(type, productId, warehouseId, quantity)
-           return { ...inventoryTransaction }
-         } catch (e) {
-           console.error('Error registering transaction', e)
-           throw e
-         }
-       }
-     }
-   },
- };
+      extend type Mutation {
+        registerTransaction(input: RegisterTransactionInput!): RegisterTransactionPayload
+      }      
+    `,
+    resolvers: {
+      Mutation: {
+        registerTransaction: async (_query, args, _context, _resolveInfo) => {
+          try {
+            const { type, productId, warehouseId, quantity } = args.input
+            const inventoryTransaction = await registerTransaction(type, productId, warehouseId, quantity)
+            return { ...inventoryTransaction }
+          } catch (e) {
+            console.error('Error registering transaction', e)
+            throw e
+          }
+        }
+      }
+    },
+  };
 });
 
 const pgUser = 'matt1'
 
 /**
-* This is our main entry point of our Express server.
-* All the routes in our API are going to be here.
-**/
+ * This is our main entry point of our Express server.
+ * All the routes in our API are going to be here.
+ **/
 const App = () => {
   const app = express()
   app.use(express.json())
@@ -66,10 +66,9 @@ const App = () => {
     appendPlugins: [RegisterTransactionPlugin],
   }))
 
-
   app.get('/api/v1/hello', async (req, res, next) => {
     res.send('success')
-  })  
+  })
 
   app.post('/api/v1/test/data', async (req, res, next) => {
     // UOM
@@ -118,7 +117,7 @@ const App = () => {
     p2.sku = 'ZYX987'
     p2.subcategory = coat
     p2.uom = each
-    
+
     // Note: this product intentionally does not have a subcategory
     // (it's configured to be nullable: true).
     const p3 = new Product()
@@ -129,8 +128,8 @@ const App = () => {
     await AppDataSource.manager.save([p1, p2, p3])
 
     res.send('data seeding completed!')
-  })  
-  
+  })
+
   return app
 }
 
